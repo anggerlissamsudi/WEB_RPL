@@ -9,7 +9,8 @@ use App\Http\Controllers\PublicRegistrationController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\ConversionController;
 use App\Http\Controllers\Admin\ProgramStudyController;
-use App\Http\Controllers\Student\DashboardController as StudentDashboardController; // Import Controller Mahasiswa
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController; 
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,10 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 */
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     
-    // Dashboard Utama Admin (Jika Anda ingin memisahkannya dengan dashboard mahasiswa)
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // Master Data - Tahun Akademik (Academic Years)
     Route::resource('academic-years', AcademicYearController::class);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Mahasiswa - Smart Class Mahardhika</title>
+    <title>Dashboard Sistem Informasi RPL - STIE Mahardhika</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100 font-sans antialiased text-gray-900">
@@ -135,29 +135,39 @@
                         </div>
 
                         <h3 class="text-sm font-bold text-indigo-900 uppercase border-b pb-2 tracking-wide pt-4">Dokumen Lampiran Pendukung</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <a href="{{ asset('storage/' . $registration->file_ktp) }}" target="_blank" class="flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-xl group transition">
-                                <span class="text-xs font-semibold text-gray-600 group-hover:text-indigo-700">File Dokumen KTP</span>
-                                <span class="text-[11px] text-indigo-600 font-bold tracking-wider group-hover:underline">LIHAT &rarr;</span>
-                            </a>
-                            <a href="{{ asset('storage/' . $registration->file_kk) }}" target="_blank" class="flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-xl group transition">
-                                <span class="text-xs font-semibold text-gray-600 group-hover:text-indigo-700">File Kartu Keluarga (KK)</span>
-                                <span class="text-[11px] text-indigo-600 font-bold tracking-wider group-hover:underline">LIHAT &rarr;</span>
-                            </a>
-                            <a href="{{ asset('storage/' . $registration->file_ijazah_sma) }}" target="_blank" class="flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-xl group transition">
-                                <span class="text-xs font-semibold text-gray-600 group-hover:text-indigo-700">File Ijazah SMA/SMK</span>
-                                <span class="text-[11px] text-indigo-600 font-bold tracking-wider group-hover:underline">LIHAT &rarr;</span>
-                            </a>
-                            <a href="{{ asset('storage/' . $registration->file_sertifikat) }}" target="_blank" class="flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-xl group transition">
-                                <span class="text-xs font-semibold text-gray-600 group-hover:text-indigo-700">File Sertifikat Kompetensi</span>
-                                <span class="text-[11px] text-indigo-600 font-bold tracking-wider group-hover:underline">LIHAT &rarr;</span>
-                            </a>
-                            @if($registration->file_ijazah_d3)
-                                <a href="{{ asset('storage/' . $registration->file_ijazah_d3) }}" target="_blank" class="flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-xl group transition sm:col-span-2">
-                                    <span class="text-xs font-semibold text-gray-600 group-hover:text-indigo-700">File Ijazah Diploma D3</span>
-                                    <span class="text-[11px] text-indigo-600 font-bold tracking-wider group-hover:underline">LIHAT &rarr;</span>
-                                </a>
-                            @endif
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50">
+                                <span class="text-sm font-bold text-gray-700">File Dokumen KTP</span>
+                                <a href="{{ asset('storage/' . $registration->file_ktp) }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline uppercase">Lihat →</a>
+                            </div>
+
+                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50">
+                                <span class="text-sm font-bold text-gray-700">File Kartu Keluarga (KK)</span>
+                                @if($registration->file_kk)
+                                    <a href="{{ asset('storage/' . $registration->file_kk) }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline uppercase">Lihat →</a>
+                                @else
+                                    <span class="text-xs font-medium text-gray-400 italic">Tidak tersedia</span>
+                                @endif
+                            </div>
+
+                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50">
+                                <span class="text-sm font-bold text-gray-700">File Ijazah SMA/SMK</span>
+                                <a href="{{ asset('storage/' . $registration->file_ijazah_sma) }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline uppercase">Lihat →</a>
+                            </div>
+
+                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50">
+                                <span class="text-sm font-bold text-gray-700">File Akta Kelahiran</span>
+                                @if($registration->birth_certificate)
+                                    <a href="{{ asset('storage/' . $registration->birth_certificate) }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline uppercase">Lihat →</a>
+                                @else
+                                    <span class="text-xs font-medium text-gray-400 italic">Tidak tersedia</span>
+                                @endif
+                            </div>
+
+                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50 md:col-span-2">
+                                <span class="text-sm font-bold text-gray-700">File Sertifikat Kompetensi</span>
+                                <a href="{{ asset('storage/' . $registration->file_sertifikat) }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline uppercase">Lihat →</a>
+                            </div>
                         </div>
                     </div>
                 </div>

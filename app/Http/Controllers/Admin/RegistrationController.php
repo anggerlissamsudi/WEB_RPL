@@ -117,25 +117,24 @@ class RegistrationController extends Controller
     public function update(Request $request, Registration $registration)
     {
         $validated = $request->validate([
-            'academic_year_id' => 'required|exists:academic_years,id',
-            'name'             => 'required|string|max:255',
-            'email'            => 'required|email',
-            'phone'            => 'required',
-            'program_study_id' => 'required|exists:program_studies,id',
-            'nik'              => 'required|numeric|digits:16',
-            'kk'               => 'required|numeric|digits:16',
-            'address'          => 'required',
-            'status'           => 'required|in:pending,converted',
+            'academic_year_id' => 'required',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required',
+            'program_study' => 'required',
+            'nik' => 'required|numeric|digits:16',
+            'kk' => 'required|numeric|digits:16',
+            'address' => 'required',
+            'mother_name' => 'required|string|max:255',
+            'nisn' => 'required|numeric|digits:10|unique:registrations,nisn,' . $registration->id,
         ]);
 
-        if ($registration->program_study_id != $request->program_study_id) {
-            $activeCurriculum = \App\Models\Curriculum::where('is_active', true)
-                ->where('program_study_id', $request->program_study_id)
-                ->first();
-
-            if ($activeCurriculum) {
-                $validated['curriculum_id'] = $activeCurriculum->id;
+        if ($request->hasFile('birth_certificate')) {
+            $request->validate(['birth_certificate' => 'file|mimes:pdf,jpg,png|max:2048']);
+            if ($registration->birth_certificate) {
+                \Storage::disk('public')->delete($registration->birth_certificate);
             }
+            $validated['birth_certificate'] = $request->file('birth_certificate')->store('pendaftaran/akta', 'public');
         }
 
         $registration->update($validated);

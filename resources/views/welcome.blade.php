@@ -12,7 +12,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center space-x-3">
-                    <span class="text-xl font-black tracking-wider text-indigo-600">MAHARDHIKA</span>
+                    <span class="text-xl font-black tracking-wider text-indigo-600">STIE MAHARDHIKA</span>
                     <span class="text-gray-300">|</span>
                     <span class="text-xs font-bold text-gray-500 uppercase tracking-wide">Sistem Informasi RPL</span>
                 </div>

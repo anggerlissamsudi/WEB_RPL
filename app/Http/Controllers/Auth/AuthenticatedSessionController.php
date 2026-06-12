@@ -31,8 +31,8 @@ class AuthenticatedSessionController extends Controller
         $userId = Auth::id(); 
         $user = \App\Models\User::find($userId);
 
-        if ($user && $user->isAdmin()) {
-            return redirect()->route('admin.registrations.index');
+        if ($user && (strtolower($user->role) === 'admin' || $user->isAdmin())) {
+            return redirect()->route('admin.dashboard');
         }
 
         if ($user && $user->registration) {

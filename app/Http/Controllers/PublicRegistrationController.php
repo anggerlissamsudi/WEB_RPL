@@ -29,38 +29,37 @@ class PublicRegistrationController extends Controller
     
     public function store(Request $request)
     {
-        if (Auth::user()->registration) {
-            return redirect()->route('dashboard')->with('error', 'Anda sudah terdaftar di sistem.');
-        }
-
+        // 1. Definisikan Aturan Validasi Mutlak (Wajib File Saat Daftar Baru)
         $rules = [
-            'birth_place_date' => 'required|string|max:255',
-            'gender' => 'required|in:Laki-Laki,Perempuan',
-            'marital_status' => 'required|in:Belum Kawin,Sudah Kawin',
-            'school_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
             'phone' => 'required',
-            'graduation_year' => 'required|digits:4',
-            'nationality' => 'required|string',
             'program_study_id' => 'required|exists:program_studies,id',
             'nik' => 'required|numeric|digits:16',
             'kk' => 'required|numeric|digits:16',
             'address' => 'required',
+            'mother_name' => 'required|string|max:255',
+            'nisn' => 'required|numeric|digits:10|unique:registrations,nisn',
+
+            'birth_certificate' => 'required|file|mimes:pdf,jpg,png|max:10240', 
             'file_ktp' => 'required|file|mimes:pdf,jpg,png|max:10240',
-            'file_kk' => 'required|file|mimes:pdf,jpg,png|max:10240',
             'file_ijazah_sma' => 'required|file|mimes:pdf,jpg,png|max:10240',
             'file_sertifikat' => 'required|file|mimes:pdf,jpg,png|max:10240',
             'file_ijazah_d3' => 'nullable|file|mimes:pdf,jpg,png|max:10240',
+            'file_kk' => 'required|file|mimes:pdf,jpg,png|max:2048',
         ];
 
+        // Validasi awal
         $validated = $request->validate($rules);
 
+        // Cari Tahun Akademik & Kurikulum Aktif
         $activeYear = AcademicYear::where('is_active', true)->first();
         if (!$activeYear) {
-            return redirect()->back()->withInput()->with('error', 'Gagal: Tidak ada Tahun Akademik yang berstatus AKTIF.');
+            return redirect()->back()->withInput()->with('error', 'Gagal: Tidak ada Tahun Akademik (Periode) yang aktif saat ini.');
         }
 
-        $activeCurriculum = Curriculum::where('is_active', true)
-            ->where('program_study_id', $request->program_study_id) 
+        $activeCurriculum = Curriculum::where('program_study_id', $request->program_study_id)
+            ->where('is_active', true)
             ->first();
 
         if (!$activeCurriculum) {
@@ -68,26 +67,50 @@ class PublicRegistrationController extends Controller
             return redirect()->back()->withInput()->with('error', 'Gagal: Kurikulum aktif untuk prodi ' . $prodiName . ' tidak ditemukan.');
         }
 
-        $validated['user_id']          = Auth::id();
-        $validated['name']             = Auth::user()->name;
-        $validated['email']            = Auth::user()->email;
-        $validated['academic_year_id'] = $activeYear->id;
-        $validated['curriculum_id']    = $activeCurriculum->id;
-        $validated['registration_number'] = 'REG-' . date('Ymd') . '-' . rand(1000, 9999);
-        $validated['status']           = 'pending';
+        // 3. Susun Array Data Bersih Untuk Disimpan ke Database
+        // Ini mencegah file temporer XAMPP bocor masuk ke query database
+        $dataToSave = [
+            $validated['user_id']          = Auth::id(),
+            $validated['academic_year_id'] = $activeYear->id,
+            $validated['program_study_id'] = $request->program_study_id,
+            $validated['curriculum_id']    = $activeCurriculum->id,
+            $validated['mother_name']      = $request->mother_name,
+            $validated['nisn']             = $request->nisn,
+            $validated['registration_number'] = 'REG-' . date('Ymd') . '-' . rand(1000, 9999),
+            $validated['status'] = 'pending',
+        ];
 
-        if ($request->hasFile('file_ktp')) $validated['file_ktp'] = $request->file('file_ktp')->store('pendaftaran/ktp', 'public');
-        if ($request->hasFile('file_kk')) $validated['file_kk'] = $request->file('file_kk')->store('pendaftaran/kk', 'public');
-        if ($request->hasFile('file_ijazah_sma')) $validated['file_ijazah_sma'] = $request->file('file_ijazah_sma')->store('pendaftaran/ijazah', 'public');
-        if ($request->hasFile('file_sertifikat')) $validated['file_sertifikat'] = $request->file('file_sertifikat')->store('pendaftaran/sertifikat', 'public');
-        if ($request->hasFile('file_ijazah_d3')) $validated['file_ijazah_d3'] = $request->file('file_ijazah_d3')->store('pendaftaran/ijazah_d3', 'public');
-
-        try {
-            Registration::create($validated);
-            return redirect()->route('dashboard')->with('success', 'Pendaftaran Anda berhasil dikirim! Silakan pantau status berkas Anda di sini.');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('error', 'Gagal menyimpan ke database: ' . $e->getMessage());
+        // 4. Proses File Upload yang Benar dan Valid
+        if ($request->hasFile('file_ktp')) {
+            $validated['file_ktp'] = $request->file('file_ktp')->store('pendaftaran/ktp', 'public');
         }
+        
+        // PASTIKAN BLOK INI ADA: Memproses file KK fisik
+        if ($request->hasFile('file_kk')) {
+            $validated['file_kk'] = $request->file('file_kk')->store('pendaftaran/kk', 'public');
+        }
+        
+        if ($request->hasFile('file_ijazah_sma')) {
+            $validated['file_ijazah_sma'] = $request->file('file_ijazah_sma')->store('pendaftaran/ijazah', 'public');
+        }
+        
+        if ($request->hasFile('file_sertifikat')) {
+            $validated['file_sertifikat'] = $request->file('file_sertifikat')->store('pendaftaran/sertifikat', 'public');
+        }
+        
+        if ($request->hasFile('file_ijazah_d3')) {
+            $validated['file_ijazah_d3'] = $request->file('file_ijazah_d3')->store('pendaftaran/ijazah_d3', 'public');
+        }
+
+        // KOREKSI UTAMA AKTA: Gunakan key array validated, bukan langsung request file temp!
+        if ($request->hasFile('birth_certificate')) {
+            $validated['birth_certificate'] = $request->file('birth_certificate')->store('pendaftaran/akta', 'public');
+        }
+
+        // 5. Simpan (Mass Assignment)
+        \App\Models\Registration::create($validated);
+
+        return redirect()->back()->with('success', 'Pendaftaran Anda berhasil dikirim! Silakan tunggu konfirmasi Admin.');
     }
 
     public function update(Request $request, $id)
@@ -114,7 +137,6 @@ class PublicRegistrationController extends Controller
             'nik' => 'required|numeric|digits:16',
             'kk' => 'required|numeric|digits:16',
             'address' => 'required',
-            // File dibuat nullable saat update data berkas
             'file_ktp' => 'nullable|file|mimes:pdf,jpg,png|max:10240',
             'file_kk' => 'nullable|file|mimes:pdf,jpg,png|max:10240',
             'file_ijazah_sma' => 'nullable|file|mimes:pdf,jpg,png|max:10240',

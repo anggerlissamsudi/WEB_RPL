@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendaftaran Mahasiswa RPL - Smart Class Mahardhika</title>
+    <title>Sistem Informasi RPL - STIE Mahardhika</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100 py-12 px-4">
@@ -140,6 +140,17 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Nama Ibu Kandung *</label>
+                        <input type="text" name="mother_name" value="{{ old('mother_name', $registration->mother_name ?? '') }}" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" placeholder="Nama Ibu Kandung" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">NISN (Nomor Induk Siswa Nasional) *</label>
+                        <input type="text" name="nisn" value="{{ old('nisn', $registration->nisn ?? '') }}" maxlength="10" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" placeholder="Contoh: 0042xxxxxx" required>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Alamat Lengkap *</label>
                     <textarea name="address" rows="3" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" required>{{ old('address', $registration->address ?? '') }}</textarea>
@@ -160,9 +171,15 @@
                             <input type="file" name="file_kk" {{ isset($registration) ? '' : 'required' }} class="text-sm">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Ijazah SMA/SMK *</label>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Ijazah Pendidikan Terakhir *</label>
                             <input type="file" name="file_ijazah_sma" {{ isset($registration) ? '' : 'required' }} class="text-sm">
                         </div>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Akta Kelahiran *</label>
+                            <input type="file" name="birth_certificate" {{ isset($registration) ? '' : 'required' }} class="text-sm">
+                        </div>
+
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Ijazah D3 (Opsional)</label>
                             <input type="file" name="file_ijazah_d3" class="text-sm">
