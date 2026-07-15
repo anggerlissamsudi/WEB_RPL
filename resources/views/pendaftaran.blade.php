@@ -73,7 +73,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Nama Lengkap *</label>
-                        <input type="text" name="name" value="{{ old('name', $registration->name ?? auth()->user()->name) }}" class="w-full bg-gray-100 border-gray-200 rounded-xl focus:ring-indigo-500 text-gray-500" placeholder="Nama Lengkap" readonly required>
+                        <input type="text" name="name" value="{{ old('name', $registration->name ?? auth()->user()->name) }}" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" placeholder="Nama Lengkap" required>
                     </div>
                 </div>
 
@@ -132,11 +132,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Nomor NIK *</label>
-                        <input type="text" name="nik" value="{{ old('nik', $registration->nik ?? '') }}" maxlength="16" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" required>
+                        <input type="text" id="nik" name="nik" value="{{ old('nik', $registration->nik ?? '') }}" maxlength="16" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500 transition-colors duration-200" required>
+                        <p id="nik-error" class="text-xs text-red-500 mt-1 hidden">Panjang NIK harus 16 digit angka.</p>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Nomor KK *</label>
-                        <input type="text" name="kk" value="{{ old('kk', $registration->kk ?? '') }}" maxlength="16" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" required>
+                        <input type="text" id="kk" name="kk" value="{{ old('kk', $registration->kk ?? '') }}" maxlength="16" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500 transition-colors duration-200" required>
+                        <p id="kk-error" class="text-xs text-red-500 mt-1 hidden">Panjang KK harus 16 digit angka.</p>
                     </div>
                 </div>
 
@@ -147,13 +149,20 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-2">NISN (Nomor Induk Siswa Nasional) *</label>
-                        <input type="text" name="nisn" value="{{ old('nisn', $registration->nisn ?? '') }}" maxlength="10" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" placeholder="Contoh: 0042xxxxxx" required>
+                        <input type="text" id="nisn" name="nisn" value="{{ old('nisn', $registration->nisn ?? '') }}" maxlength="10" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500 transition-colors duration-200" placeholder="Contoh: 0042xxxxxx" required>
+                        <p id="nisn-error" class="text-xs text-red-500 mt-1 hidden">Panjang NISN harus 10 digit angka.</p>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Alamat Lengkap *</label>
                     <textarea name="address" rows="3" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" required>{{ old('address', $registration->address ?? '') }}</textarea>
+                </div>
+
+                <!-- PERUBAHAN BARU: Input Referal Pendaftaran (Berada di tengah) -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Referal Pendaftaran (Opsional)</label>
+                    <input type="text" name="referral" value="{{ old('referral', $registration->referral ?? '') }}" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" placeholder="Masukkan nama Marketing atau Staff">
                 </div>
 
                 <div class="bg-indigo-50 p-6 rounded-2xl border-2 border-dashed border-indigo-100 space-y-4">
@@ -171,7 +180,7 @@
                             <input type="file" name="file_kk" {{ isset($registration) ? '' : 'required' }} class="text-sm">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Ijazah Pendidikan Terakhir *</label>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Ijazah SMA/SMK/MA *</label>
                             <input type="file" name="file_ijazah_sma" {{ isset($registration) ? '' : 'required' }} class="text-sm">
                         </div>
                         
@@ -201,5 +210,34 @@
             &copy; {{ date('Y') }} STIE Mahardhika Surabaya - Sistem Informasi RPL
         </p>
     </div>
+
+    <!-- JAVASCRIPT VALIDATION UNTUK NIK, KK, & NISN -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            function validateInputLength(inputId, errorId, requiredLength) {
+                const inputElement = document.getElementById(inputId);
+                const errorElement = document.getElementById(errorId);
+
+                inputElement.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+
+                    if (this.value.length > 0 && this.value.length < requiredLength) {
+                        inputElement.classList.remove('bg-gray-50', 'border-gray-200', 'focus:ring-indigo-500');
+                        inputElement.classList.add('bg-red-50', 'border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                        errorElement.classList.remove('hidden');
+                    } else {
+                        inputElement.classList.remove('bg-red-50', 'border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                        inputElement.classList.add('bg-gray-50', 'border-gray-200', 'focus:ring-indigo-500');
+                        errorElement.classList.add('hidden');
+                    }
+                });
+            }
+
+            validateInputLength('nik', 'nik-error', 16);
+            validateInputLength('kk', 'kk-error', 16);
+            validateInputLength('nisn', 'nisn-error', 10);
+        });
+    </script>
 </body>
 </html>

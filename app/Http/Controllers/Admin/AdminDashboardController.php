@@ -32,12 +32,17 @@ class AdminDashboardController extends Controller
             $query->where('status', 'converted');
         }])->orderBy('year_code', 'desc')->get();
 
+        $registrations = Registration::with(['programStudy', 'academicYear'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('admin.dashboard', compact(
             'pendingCount', 
             'convertedCount', 
             'chartLabels', 
             'chartData', 
-            'convertedByYear'
+            'convertedByYear',
+            'registrations' 
         ));
     }
 }

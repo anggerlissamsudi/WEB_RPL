@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Illuminate\Validation\Rules\Password;
 
 class RegisteredUserController extends Controller
 {
@@ -33,7 +34,15 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required', 
+                'confirmed', 
+                Password::min(8)       // Mengatur panjang minimal 8 karakter
+                    ->letters()        // Wajib mengandung huruf
+                    ->mixedCase()      // Wajib ada kombinasi huruf besar (uppercase) & kecil (lowercase)
+                    ->numbers()        // Wajib mengandung angka
+                    ->symbols(),       // Wajib mengandung simbol/karakter unik
+            ],
         ]);
 
         $user = User::create([

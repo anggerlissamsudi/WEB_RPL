@@ -43,6 +43,8 @@ class RegistrationController extends Controller
 
     public function show(Registration $registration)
     {
+        $registration->load('programStudy');
+        
         return view('admin.registrations.show', compact('registration'));
     }
 

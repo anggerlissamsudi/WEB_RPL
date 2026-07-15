@@ -24,6 +24,10 @@ class Registration extends Model
         'nationality', 
         'nik', 
         'kk', 
+        'mother_name',       // Selesai ditambahkan
+        'nisn',       
+        'referral',       // Selesai ditambahkan
+        'birth_certificate', // Selesai ditambahkan
         'file_ktp', 
         'file_kk', 
         'file_ijazah_sma', 
@@ -31,7 +35,6 @@ class Registration extends Model
         'file_ijazah_d3',
         'status',
     ];
-
     public function conversions()
     {
         return $this->hasMany(Conversion::class);

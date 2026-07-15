@@ -44,16 +44,33 @@
 
                             <div>
                                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Program Studi</label>
-                                <p class="text-gray-900 font-semibold">{{ $registration->program_study }}</p>
+                                <!-- PERUBAHAN: Memanggil object relasi name yang benar -->
+                                <p class="text-gray-900 font-semibold">{{ $registration->programStudy->name ?? 'Belum Memilih' }}</p>
                             </div>
+
+                            <!-- PERUBAHAN: Menambahkan informasi Tempat, Tanggal Lahir -->
+                            <div>
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tempat, Tanggal Lahir</label>
+                                <p class="text-gray-900 font-semibold">{{ $registration->birth_place_date ?? '-' }}</p>
+                            </div>
+
                             <div>
                                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Kontak</label>
                                 <p class="text-gray-900 font-semibold">{{ $registration->email }}</p>
                                 <p class="text-gray-500 text-sm">{{ $registration->phone }}</p>
                             </div>
+
                             <div>
                                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Alamat</label>
                                 <p class="text-gray-900 font-semibold text-sm">{{ $registration->address }}</p>
+                            </div>
+
+                            <!-- PERUBAHAN: Menambahkan informasi Referral Pendaftaran -->
+                            <div class="pt-3 border-t border-dashed border-gray-100">
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Referal Pendaftaran</label>
+                                <p class="text-emerald-700 font-bold text-sm mt-0.5">
+                                    {{ $registration->referral ?? 'Mandiri (Tanpa Referal)' }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -68,7 +85,6 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                             @php
-                                // PENYESUAIAN: Menyisipkan Akta Kelahiran ke dalam list perulangan berkas
                                 $files = [
                                     ['label' => 'KTP', 'field' => 'file_ktp'],
                                     ['label' => 'Kartu Keluarga', 'field' => 'file_kk'],

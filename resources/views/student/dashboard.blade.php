@@ -31,6 +31,45 @@
 
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
+        <!-- NOTIFIKASI KHUSUS PASCA BERHASIL DAFTAR FORMULIR RPL -->
+        @if(session('success_pendaftaran'))
+            <div class="mb-6 p-6 bg-emerald-50 border border-emerald-200 rounded-3xl shadow-sm text-gray-900">
+                <div class="flex items-start space-x-4">
+                    <!-- Icon Centang Sukses -->
+                    <div class="p-2 bg-emerald-500 rounded-xl text-white mt-0.5 shadow-md shadow-emerald-100">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <h3 class="text-base font-bold text-emerald-800">Berhasil!</h3>
+                        <p class="text-sm text-emerald-700 mt-1">{{ session('success_pendaftaran') }}</p>
+                        
+                        <!-- Kotak Informasi Detail Akun -->
+                        <div class="mt-4 bg-white p-4 rounded-2xl border border-gray-150 text-sm max-w-md shadow-sm">
+                            <p class="font-bold text-[11px] uppercase tracking-wider text-gray-400 mb-2">Akses Login Dashboard Anda:</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <span class="text-gray-500 text-xs">Email Login:</span>
+                                    <span class="font-mono font-bold text-indigo-600 text-sm">{{ session('registered_email') }}</span>
+                                </div>
+                                <div class="flex justify-between pt-0.5">
+                                    <span class="text-gray-500 text-xs">Password:</span>
+                                    <span class="text-gray-400 italic text-xs">Menggunakan password registrasi awal Anda</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="text-[11px] text-orange-600 font-semibold mt-3">
+                            * Penting: Harap catat atau ingat email Anda untuk kebutuhan login kembali ke sistem di masa mendatang.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+        
+        <!-- Notifikasi Bawaan Lainnya -->
         @if(session('success'))
             <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-xl shadow-sm">
                 <p class="font-bold">Berhasil!</p>
@@ -71,18 +110,11 @@
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Kontrol Data</h4>
                     
-                    @if($registration->status === 'pending')
-                        <p class="text-xs text-gray-500 mb-4">Apakah ada berkas atau data data diri yang salah ketik? Anda masih bisa memperbaruinya sebelum dinilai oleh admin.</p>
-                        <a href="{{ route('pendaftaran.index') }}" class="block text-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-indigo-100 transition transform active:scale-95 text-sm">
-                            Ubah Data Formulir
-                        </a>
-                    @else
-                        <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-center">
-                            <svg class="w-6 h-6 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            <p class="text-xs text-gray-400 font-semibold uppercase">Akses Edit Dikunci</p>
-                            <p class="text-[11px] text-gray-400 mt-1">Data Anda telah sah dikonversi menjadi sks akademik dan tidak dapat diubah lagi.</p>
-                        </div>
-                    @endif
+                    <!-- PERUBAHAN: Menghapus penguncian status agar tombol edit selalu muncul dan bisa diakses mahasiswa -->
+                    <p class="text-xs text-gray-500 mb-4">Apakah ada berkas atau data data diri yang salah ketik? Anda masih bisa memperbaruinya kapan saja diperlukan.</p>
+                    <a href="{{ route('pendaftaran.index') }}" class="block text-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-indigo-100 transition transform active:scale-95 text-sm">
+                        Ubah Data Formulir
+                    </a>
                 </div>
             </div>
 
@@ -164,7 +196,17 @@
                                 @endif
                             </div>
 
-                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50 md:col-span-2">
+                            <!-- PERUBAHAN: Menambahkan slot view untuk dokumen Ijazah D3 Mahasiswa -->
+                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50">
+                                <span class="text-sm font-bold text-gray-700">File Ijazah D3 (Opsional)</span>
+                                @if($registration->file_ijazah_d3)
+                                    <a href="{{ asset('storage/' . $registration->file_ijazah_d3) }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline uppercase">Lihat →</a>
+                                @else
+                                    <span class="text-xs font-medium text-gray-400 italic">Tidak tersedia</span>
+                                @endif
+                            </div>
+
+                            <div class="p-4 border border-gray-100 rounded-2xl flex justify-between items-center bg-gray-50/50">
                                 <span class="text-sm font-bold text-gray-700">File Sertifikat Kompetensi</span>
                                 <a href="{{ asset('storage/' . $registration->file_sertifikat) }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline uppercase">Lihat →</a>
                             </div>

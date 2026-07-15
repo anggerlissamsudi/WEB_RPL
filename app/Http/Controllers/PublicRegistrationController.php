@@ -20,9 +20,9 @@ class PublicRegistrationController extends Controller
         $user = Auth::user();
         $registration = $user->registration;
 
-        if ($registration && $registration->status === 'converted') {
-            return redirect()->route('dashboard')->with('error', 'Data Anda sudah disetujui dan dikonversi oleh admin, data tidak dapat diubah lagi.');
-        }
+      //  if ($registration && $registration->status === 'converted') {
+        //    return redirect()->route('dashboard')->with('error', 'Data Anda sudah disetujui dan dikonversi oleh admin, data tidak dapat diubah lagi.');
+        // }
 
         return view('pendaftaran', compact('programStudies', 'registration'));
     }    
@@ -40,7 +40,7 @@ class PublicRegistrationController extends Controller
             'address' => 'required',
             'mother_name' => 'required|string|max:255',
             'nisn' => 'required|numeric|digits:10|unique:registrations,nisn',
-
+            'referral' => 'nullable|string|max:255',
             'birth_certificate' => 'required|file|mimes:pdf,jpg,png|max:10240', 
             'file_ktp' => 'required|file|mimes:pdf,jpg,png|max:10240',
             'file_ijazah_sma' => 'required|file|mimes:pdf,jpg,png|max:10240',
@@ -67,25 +67,11 @@ class PublicRegistrationController extends Controller
             return redirect()->back()->withInput()->with('error', 'Gagal: Kurikulum aktif untuk prodi ' . $prodiName . ' tidak ditemukan.');
         }
 
-        // 3. Susun Array Data Bersih Untuk Disimpan ke Database
-        // Ini mencegah file temporer XAMPP bocor masuk ke query database
-        $dataToSave = [
-            $validated['user_id']          = Auth::id(),
-            $validated['academic_year_id'] = $activeYear->id,
-            $validated['program_study_id'] = $request->program_study_id,
-            $validated['curriculum_id']    = $activeCurriculum->id,
-            $validated['mother_name']      = $request->mother_name,
-            $validated['nisn']             = $request->nisn,
-            $validated['registration_number'] = 'REG-' . date('Ymd') . '-' . rand(1000, 9999),
-            $validated['status'] = 'pending',
-        ];
-
-        // 4. Proses File Upload yang Benar dan Valid
+        // 2. Proses File Upload dan Simpan Path-nya ke Array $validated
         if ($request->hasFile('file_ktp')) {
             $validated['file_ktp'] = $request->file('file_ktp')->store('pendaftaran/ktp', 'public');
         }
         
-        // PASTIKAN BLOK INI ADA: Memproses file KK fisik
         if ($request->hasFile('file_kk')) {
             $validated['file_kk'] = $request->file('file_kk')->store('pendaftaran/kk', 'public');
         }
@@ -102,15 +88,33 @@ class PublicRegistrationController extends Controller
             $validated['file_ijazah_d3'] = $request->file('file_ijazah_d3')->store('pendaftaran/ijazah_d3', 'public');
         }
 
-        // KOREKSI UTAMA AKTA: Gunakan key array validated, bukan langsung request file temp!
         if ($request->hasFile('birth_certificate')) {
             $validated['birth_certificate'] = $request->file('birth_certificate')->store('pendaftaran/akta', 'public');
         }
 
-        // 5. Simpan (Mass Assignment)
+        // PERUBAHAN UTAMA: Memasukkan semua input teks form yang belum masuk ke array $validated
+        $validated['birth_place_date']  = $request->birth_place_date;
+        $validated['gender']            = $request->gender;
+        $validated['marital_status']    = $request->marital_status;
+        $validated['school_name']       = $request->school_name;
+        $validated['graduation_year']   = $request->graduation_year;
+        $validated['nationality']       = $request->nationality;
+
+        // 3. Inject Data Sistem Otomatis
+        $validated['user_id']             = Auth::id();
+        $validated['academic_year_id']    = $activeYear->id;
+        $validated['curriculum_id']       = $activeCurriculum->id;
+        $validated['registration_number'] = 'REG-' . date('Ymd') . '-' . rand(1000, 9999);
+        $validated['status']              = 'pending';
+
+        // 4. Simpan ke Database
         \App\Models\Registration::create($validated);
 
-        return redirect()->back()->with('success', 'Pendaftaran Anda berhasil dikirim! Silakan tunggu konfirmasi Admin.');
+        // 5. Berhasil Diarahkan Melompat ke Dashboard Mahasiswa
+        return redirect()->route('dashboard')->with([
+            'success_pendaftaran' => 'Pendaftaran Anda berhasil dikirim! Silakan tunggu konfirmasi Admin.',
+            'registered_email'    => Auth::user()->email
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -137,6 +141,7 @@ class PublicRegistrationController extends Controller
             'nik' => 'required|numeric|digits:16',
             'kk' => 'required|numeric|digits:16',
             'address' => 'required',
+            'referral' => 'nullable|string|max:255',
             'file_ktp' => 'nullable|file|mimes:pdf,jpg,png|max:10240',
             'file_kk' => 'nullable|file|mimes:pdf,jpg,png|max:10240',
             'file_ijazah_sma' => 'nullable|file|mimes:pdf,jpg,png|max:10240',

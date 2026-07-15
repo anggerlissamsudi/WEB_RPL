@@ -8,6 +8,7 @@
     <div class="py-12 bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             
+            <!-- CARD STATISTIK -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white overflow-hidden shadow-sm rounded-2xl p-6 border border-yellow-100 flex items-center justify-between">
                     <div>
@@ -30,6 +31,7 @@
                 </div>
             </div>
 
+            <!-- GRAFIK -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Grafik Jumlah Pendaftar Mahasiswa RPL Per Tahun</h3>
                 <div class="h-64 relative">
@@ -37,33 +39,70 @@
                 </div>
             </div>
 
+            <!-- TABEL DAFTAR SELURUH PENDAFTAR MAHASISWA -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Rincian Mahasiswa Terkonversi Berdasarkan Periode</h3>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Daftar Seluruh Pendaftar Mahasiswa RPL</h3>
+                    <span class="text-xs font-semibold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-xl">Total: {{ $registrations->count() }} Pendaftar</span>
+                </div>
+                
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="bg-gray-50 text-gray-500 font-bold border-b border-gray-100 text-xs uppercase">
-                                <th class="p-4">Tahun Akademik</th>
-                                <th class="p-4">Kode Periode</th>
-                                <th class="p-4 text-right">Jumlah Mahasiswa Terkonversi</th>
+                                <th class="p-4">No. Registrasi</th>
+                                <th class="p-4">Nama Lengkap</th>
+                                <th class="p-4">Program Studi</th>
+                                <th class="p-4">Kontak / WhatsApp</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 text-gray-600">
-                            @foreach($convertedByYear as $year)
+                            @forelse($registrations as $reg)
                                 <tr class="hover:bg-gray-50/50 transition">
-                                    <td class="p-4 font-semibold text-gray-900">{{ $year->year_name ?? 'N/A' }}</td>
-                                    <td class="p-4 text-xs font-mono bg-gray-50 rounded px-2 py-0.5 inline-block mt-3">{{ $year->year_code }}</td>
-                                    <td class="p-4 text-right font-bold text-indigo-600">{{ $year->total_converted }} Orang</td>
+                                    <td class="p-4 font-mono text-xs font-bold text-gray-900">{{ $reg->registration_number }}</td>
+                                    <td class="p-4">
+                                        <div class="font-semibold text-gray-800">{{ $reg->name }}</div>
+                                        <div class="text-xs text-gray-400 font-mono">{{ $reg->email }}</div>
+                                    </td>
+                                    <td class="p-4 text-xs font-medium text-gray-700">
+                                        {{ $reg->programStudy->name ?? 'Tidak Diketahui' }}
+                                    </td>
+                                    <td class="p-4 text-xs font-mono text-gray-700">
+                                        {{ $reg->phone }}
+                                    </td>
+                                    <td class="p-4">
+                                        @if($reg->status === 'pending')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                PENDING
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                CONVERTED
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <a href="{{ route('admin.registrations.show', $reg->id) }}" class="inline-flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm">
+                                            Lihat Berkas & Detail
+                                        </a>
+                                    </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="p-8 text-center text-gray-400 italic">Belum ada mahasiswa yang mengirimkan formulir pendaftaran.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
 
-        </div>
-    </div>
+        </div> <!-- Penutup max-w-7xl -->
+    </div> <!-- Penutup py-12 -->
 
+    <!-- CHART.JS INJECTIONS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx = document.getElementById('rplYearlyChart').getContext('2d');

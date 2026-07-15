@@ -1,14 +1,12 @@
 <x-guest-layout>
     <form method="POST" action="{{ route('register') }}">
         @csrf
-
         <!-- Name -->
         <div>
-            <x-input-label for="name" :value="__('Name')" />
+            <x-input-label for="name" :value="__('Nama Lengkap')" />
             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
-
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
@@ -21,10 +19,13 @@
             <x-input-label for="password" :value="__('Password')" />
 
             <div class="relative mt-1">
+                <!-- Ditambahkan atribut pattern untuk regex validasi di HTML5 -->
                 <x-text-input id="password" class="block mt-1 w-full pr-10"
                                 type="password"
                                 name="password"
-                                required autocomplete="new-password" />
+                                required autocomplete="new-password" 
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                                title="Password harus minimal 8 karakter dan mengandung huruf besar, huruf kecil, angka, serta simbol (@$!%*?&)." />
                 
                 <button type="button" onclick="togglePasswordVisibility('password', 'eye-icon-pass')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
                     <svg id="eye-icon-pass" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -34,11 +35,16 @@
                 </button>
             </div>
 
+            <!-- Teks Notifikasi/Panduan untuk Calon Mahasiswa -->
+            <p class="mt-1 text-xs text-gray-500">
+                * Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan simbol (contoh: Mahasiswa123!).
+            </p>
+
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
 
             <div class="relative mt-1">
                 <x-text-input id="password_confirmation" class="block mt-1 w-full pr-10"
