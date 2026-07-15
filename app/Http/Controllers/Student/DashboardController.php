@@ -4,21 +4,29 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; 
+use App\Models\User;
+use App\Models\Registration;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
-        $user = \App\Models\User::find($userId);
-
+        $user = \App\Models\User::find(Auth::id());
+        
         $registration = $user ? $user->registration : null;
 
-        if (!$registration) {
-            return redirect()->route('pendaftaran.index');
+        $courses = collect();
+        $conversions = collect();
+
+        if ($registration) {
+            $courses = $registration->curriculum 
+                ? $registration->curriculum->courses()->orderBy('semester')->get() 
+                : collect();
+
+            $conversions = $registration->conversions->keyBy('course_id');
         }
 
-        return view('student.dashboard', compact('registration'));
+        return view('student.dashboard', compact('registration', 'courses', 'conversions'));
     }
 }

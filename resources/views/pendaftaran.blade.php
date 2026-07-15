@@ -109,11 +109,11 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Pendidikan Terakhir *</label>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Pendidikan Terakhir SMA/SMK/MA *</label>
                         <input type="text" name="school_name" value="{{ old('school_name', $registration->school_name ?? '') }}" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" placeholder="Contoh : SMA ...." required>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Tahun Lulus SMA/SMK *</label>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Tahun Lulus SMA/SMK/MA *</label>
                         <input type="number" name="graduation_year" value="{{ old('graduation_year', $registration->graduation_year ?? '') }}" class="w-full bg-gray-50 border-gray-200 rounded-xl focus:ring-indigo-500" placeholder="Contoh: 2020" required>
                     </div>
                 </div>

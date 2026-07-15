@@ -14,18 +14,18 @@ class PublicRegistrationController extends Controller
 {
     public function index()
     {
-        $programStudies = ProgramStudy::all();
+        $user = \App\Models\User::find(Auth::id());
+        $registration = $user ? $user->registration : null;
+
+        if ($registration && in_array($registration->status, ['pending', 'converted'])) {
+            return redirect()->route('dashboard')->with('error', 'Anda sudah melakukan pengisian formulir.');
+        }
+
+        $programStudies = \App\Models\ProgramStudy::all();
         
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $registration = $user->registration;
-
-      //  if ($registration && $registration->status === 'converted') {
-        //    return redirect()->route('dashboard')->with('error', 'Data Anda sudah disetujui dan dikonversi oleh admin, data tidak dapat diubah lagi.');
-        // }
-
+        // Sesuaikan dengan nama view formulir pendaftaran Anda (misal 'pendaftaran' atau 'student.pendaftaran')
         return view('pendaftaran', compact('programStudies', 'registration'));
-    }    
+    }
     
     public function store(Request $request)
     {
@@ -46,7 +46,7 @@ class PublicRegistrationController extends Controller
             'file_ijazah_sma' => 'required|file|mimes:pdf,jpg,png|max:10240',
             'file_sertifikat' => 'required|file|mimes:pdf,jpg,png|max:10240',
             'file_ijazah_d3' => 'nullable|file|mimes:pdf,jpg,png|max:10240',
-            'file_kk' => 'required|file|mimes:pdf,jpg,png|max:2048',
+            'file_kk' => 'required|file|mimes:pdf,jpg,png|max:10240',
         ];
 
         // Validasi awal
@@ -135,7 +135,7 @@ class PublicRegistrationController extends Controller
             'marital_status' => 'required|in:Belum Kawin,Sudah Kawin',
             'school_name' => 'required|string|max:255',
             'phone' => 'required',
-            'graduation_year' => 'required|digits:4',
+            'graduation_year' => 'required|numeric|digits:4',
             'nationality' => 'required|string',
             'program_study_id' => 'required|exists:program_studies,id',
             'nik' => 'required|numeric|digits:16',

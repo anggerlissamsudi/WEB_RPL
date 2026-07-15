@@ -22,12 +22,12 @@ Route::get('/', function () {
 });
 
 // Jalur Pendaftaran Calon Mahasiswa Sisi Public (Bisa diakses setelah login/auth)
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/daftar', [PublicRegistrationController::class, 'index'])->name('pendaftaran.index');
     Route::post('/daftar/proses', [PublicRegistrationController::class, 'store'])->name('pendaftaran.store');
-    Route::put('/daftar/update/{id}', [PublicRegistrationController::class, 'update'])->name('pendaftaran.update'); // Penambahan Rute Update Berkas
+    Route::put('/daftar/update/{id}', [PublicRegistrationController::class, 'update'])->name('pendaftaran.update'); 
     
-    // Dashboard Ringkasan Utama Khusus Sisi Mahasiswa (Menggantikan view bawaan Breeze)
+    // Dashboard Utama Khusus Sisi Mahasiswa
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
 });
 

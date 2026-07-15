@@ -83,7 +83,6 @@
                                         <option value="">-</option>
                                         <option value="A" {{ ($conv && $conv->assessment_score == 'A') ? 'selected' : '' }}>A</option>
                                         <option value="B" {{ ($conv && $conv->assessment_score == 'B') ? 'selected' : '' }}>B</option>
-                                        <option value="C" {{ ($conv && $conv->assessment_score == 'C') ? 'selected' : '' }}>C</option>
                                     </select>
                                 </td>
 
@@ -151,17 +150,22 @@
                     </table>
                 </div>
 
-                <div class="bg-white p-8 rounded-b-3xl border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
-                    <a href="{{ route('admin.registrations.pdf', $registration->id) }}" 
-                        id="btn-cetak-pdf" 
-                        class="w-full md:w-auto text-center bg-red-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-red-600 transition uppercase tracking-widest text-xs shadow-lg shadow-red-100 italic">
-                        Cetak PDF
-                    </a>
-
-                    <button type="submit" 
-                            class="w-full md:w-auto bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition uppercase tracking-widest text-xs transform active:scale-95">
+                <div class="bg-white p-8 rounded-b-3xl border-t border-gray-100 flex flex-col md:flex-row justify-end items-center gap-4 shadow-sm">
+                    
+                    <!-- Tombol 1: Simpan Saja ke Database -->
+                    <button type="submit" name="action" value="save_only"
+                            class="w-full md:w-auto text-center bg-white border border-gray-200 text-gray-700 px-8 py-4 rounded-2xl font-black hover:bg-gray-50 hover:text-indigo-600 transition uppercase tracking-widest text-xs shadow-sm flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
                         Simpan Hasil Konversi
                     </button>
+
+                    <!-- Tombol 2: Simpan Sekaligus Langsung Unduh Cetak PDF -->
+                    <button type="submit" name="action" value="save_and_print" 
+                            class="w-full md:w-auto bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition uppercase tracking-widest text-xs transform active:scale-95 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        Simpan & Cetak PDF
+                    </button>
+                    
                 </div>
             </form>
         </div>

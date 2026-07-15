@@ -39,7 +39,6 @@ class ConversionController extends Controller
         try {
             DB::beginTransaction(); 
 
-            // Hapus data lama agar sinkron
             Conversion::where('registration_id', $registration->id)->delete();
 
             foreach ($request->course_ids as $courseId => $value) {
@@ -52,11 +51,53 @@ class ConversionController extends Controller
                 ]);
             }
 
-            $registration->status = 'converted';
+            if ($request->input('action') === 'save_and_print') {
+                $registration->status = 'converted';
+                $registration->save(); 
+
+                DB::commit(); 
+
+                $courses = Course::where('curriculum_id', $registration->curriculum_id)
+                                ->orderBy('semester')
+                                ->get();
+
+                $conversions = Conversion::where('registration_id', $registration->id)->get()->keyBy('course_id'); 
+                
+                $summary = [];
+                $totalAccepted = 0;
+                $totalRequired = 0;
+
+                for ($i = 1; $i <= 7; $i++) {
+                    $semCourses = $courses->where('semester', $i);
+                    $accepted = 0;
+                    $required = 0;
+
+                    foreach ($semCourses as $course) {
+                        $conv = $conversions[$course->id] ?? null;
+                        if ($conv && $conv->is_recognized) {
+                            $accepted += $course->credits;
+                        } else {
+                            $required += $course->credits;
+                        }
+                    }
+                    $summary[$i] = ['accepted' => $accepted, 'required' => $required];
+                    $totalAccepted += $accepted;
+                    $totalRequired += $required;
+                }
+
+                $pdf = Pdf::loadView('admin.conversion.pdf', compact(
+                    'registration', 'courses', 'conversions', 'summary', 'totalAccepted', 'totalRequired'
+                ))->setPaper('a4', 'portrait');
+
+                return $pdf->download('FORM_RPL_A_'.$registration->name.'.pdf');
+            }
+
+            $registration->status = 'draft_converted';
             $registration->save(); 
 
             DB::commit(); 
-            return redirect()->back()->with('success', 'Hasil konversi berhasil diperbarui.');
+
+            return redirect()->back()->with('success', 'Draf hasil konversi berhasil disimpan (Belum diterbitkan ke mahasiswa).');
 
         } catch (\Exception $e) {
             DB::rollBack(); 
